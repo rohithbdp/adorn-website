@@ -188,21 +188,15 @@ nextjs-portal {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+    /* Allow scrolling while preventing zoom */
+    touch-action: manipulation;
   }
   
-  /* Increase touch target size slightly */
-  button[data-index]::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    z-index: -1;
-  }
+  /* Remove the touch target expansion to prevent scroll interference */
   
-  /* Prevent accidental touches during scrolling */
-  .touch-scrolling button[data-index] {
-    pointer-events: none;
+  /* Ensure smooth scrolling on gallery modal */
+  .gallery-modal {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }

@@ -32,6 +32,9 @@ export default function GalleryModal({
   const modalRef = useRef<HTMLDivElement>(null);
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const lastTouchTime = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
+  const touchStartX = useRef<number>(0);
+  const isScrolling = useRef<boolean>(false);
 
   useEffect(() => {
     // Focus modal on mount for keyboard navigation
@@ -42,7 +45,7 @@ export default function GalleryModal({
 
   return (
     <div 
-      className="fixed inset-0 z-[60] bg-black/90 overflow-y-auto"
+      className="fixed inset-0 z-[60] bg-black/90 overflow-y-auto gallery-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="gallery-title"
@@ -161,22 +164,36 @@ export default function GalleryModal({
                       e.stopPropagation();
                       handleThumbnailClick(index);
                     }}
-                    onTouchEnd={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      // For touch devices, use the bound index directly
-                      handleThumbnailClick(index);
+                    onTouchStart={(e) => {
+                      touchStartY.current = e.touches[0].clientY;
+                      touchStartX.current = e.touches[0].clientX;
+                      isScrolling.current = false;
                     }}
-                    onPointerDown={(e) => {
-                      // Prevent any default touch behaviors
-                      e.preventDefault();
+                    onTouchMove={(e) => {
+                      const touchY = e.touches[0].clientY;
+                      const touchX = e.touches[0].clientX;
+                      const deltaY = Math.abs(touchY - touchStartY.current);
+                      const deltaX = Math.abs(touchX - touchStartX.current);
+                      
+                      // If user moved more than 10px, consider it scrolling
+                      if (deltaY > 10 || deltaX > 10) {
+                        isScrolling.current = true;
+                      }
+                    }}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                      // Only handle click if not scrolling
+                      if (!isScrolling.current) {
+                        e.preventDefault();
+                        handleThumbnailClick(index);
+                      }
                     }}
                     className={`relative aspect-square overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 touch-none select-none ${
                       index === currentImageIndex ? 'ring-2 ring-cyan-400' : ''
                     }`}
                     aria-label={`View image ${index + 1} of ${galleryData[selectedGallery].length}`}
                     type="button"
-                    style={{ touchAction: 'none' }}
+                    style={{ touchAction: 'manipulation' }}
                   >
                     <img
                       src={photo.src}
