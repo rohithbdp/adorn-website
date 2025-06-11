@@ -190,6 +190,11 @@ export default function Home() {
       };
     }
   }, [selectedGallery, handleKeyDown]);
+  
+  // Reset index when gallery changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [selectedGallery]);
 
   // Handle swipe gestures for mobile
   const [touchStart, setTouchStart] = useState(0);
@@ -254,7 +259,7 @@ export default function Home() {
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} basePath={basePath} />
       
       {/* Gallery View Modal */}
-      {selectedGallery && galleryData[selectedGallery] && (
+      {selectedGallery && galleryData[selectedGallery] && galleryData[selectedGallery].length > 0 && (
         <Suspense fallback={
           <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center">
             <div className="text-white">Loading gallery...</div>
@@ -482,8 +487,8 @@ export default function Home() {
               <button
                 key={category.id}
                 onClick={() => {
-                  setSelectedGallery(category.id);
                   setCurrentImageIndex(0);
+                  setSelectedGallery(category.id);
                 }}
                 className={`rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black text-left w-full ${
                   category.color === 'pink' ? 'bg-gradient-to-br from-pink-900/20 to-pink-600/20 border border-pink-500/20' :
