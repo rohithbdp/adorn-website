@@ -62,9 +62,12 @@ export default function GalleryModal({
           </h2>
           <button
             onClick={() => {
-              setSelectedGallery(null);
-              setCurrentImageIndex(0);
               setImageZoom(false);
+              setCurrentImageIndex(0);
+              // Delay to ensure state is cleared
+              setTimeout(() => {
+                setSelectedGallery(null);
+              }, 50);
             }}
             className="text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black rounded-sm p-1"
             aria-label="Close gallery"

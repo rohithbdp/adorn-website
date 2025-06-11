@@ -22,6 +22,7 @@ export default function Home() {
   const [imageZoom, setImageZoom] = useState(false);
   const galleryModalRef = useRef<HTMLDivElement>(null);
   const [loadingGallery, setLoadingGallery] = useState(true);
+  const [galleryKey, setGalleryKey] = useState(0); // Force re-render of gallery modal
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState({
@@ -266,6 +267,7 @@ export default function Home() {
           </div>
         }>
           <GalleryModal
+            key={`${selectedGallery}-${galleryKey}`} // Force new instance
             selectedGallery={selectedGallery}
             galleryData={galleryData}
             currentImageIndex={currentImageIndex}
@@ -487,8 +489,14 @@ export default function Home() {
               <button
                 key={category.id}
                 onClick={() => {
+                  // Force complete reset
                   setCurrentImageIndex(0);
-                  setSelectedGallery(category.id);
+                  setImageZoom(false);
+                  setGalleryKey(prev => prev + 1); // Force re-render
+                  // Small delay to ensure state is cleared
+                  setTimeout(() => {
+                    setSelectedGallery(category.id);
+                  }, 50);
                 }}
                 className={`rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black text-left w-full ${
                   category.color === 'pink' ? 'bg-gradient-to-br from-pink-900/20 to-pink-600/20 border border-pink-500/20' :
