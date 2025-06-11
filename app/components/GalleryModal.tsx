@@ -10,7 +10,7 @@ interface GalleryModalProps {
   currentImageIndex: number;
   imageZoom: boolean;
   setSelectedGallery: (gallery: string | null) => void;
-  setCurrentImageIndex: (index: number) => void;
+  setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
   setImageZoom: (zoom: boolean) => void;
   handleTouchStart: (e: React.TouchEvent) => void;
   handleTouchMove: (e: React.TouchEvent) => void;
@@ -108,7 +108,7 @@ export default function GalleryModal({
               {galleryData[selectedGallery].length > 1 && (
                 <>
                   <button
-                    onClick={() => setCurrentImageIndex((prev) => (prev - 1 + galleryData[selectedGallery].length) % galleryData[selectedGallery].length)}
+                    onClick={() => setCurrentImageIndex((prev: number) => (prev - 1 + galleryData[selectedGallery].length) % galleryData[selectedGallery].length)}
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 p-2 rounded-full text-white hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     aria-label="Previous image"
                   >
@@ -117,7 +117,7 @@ export default function GalleryModal({
                     </svg>
                   </button>
                   <button
-                    onClick={() => setCurrentImageIndex((prev) => (prev + 1) % galleryData[selectedGallery].length)}
+                    onClick={() => setCurrentImageIndex((prev: number) => (prev + 1) % galleryData[selectedGallery].length)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 p-2 rounded-full text-white hover:bg-black/70 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-400"
                     aria-label="Next image"
                   >
