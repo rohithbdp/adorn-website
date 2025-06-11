@@ -11,7 +11,7 @@ const GalleryModal = lazy(() => import('./components/GalleryModal'));
 const basePath = process.env.NODE_ENV === 'production' ? '/adorn-website' : '';
 
 export default function Home() {
-  const [typedText, setTypedText] = useState('');
+  const [typedText, setTypedText] = useState('Professional Photographer');
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [showFullGallery, setShowFullGallery] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,21 +42,33 @@ export default function Home() {
   useEffect(() => {
     const text = typingTexts[currentTextIndex];
     let charIndex = 0;
-
-    const typeInterval = setInterval(() => {
-      if (charIndex <= text.length) {
-        setTypedText(text.slice(0, charIndex));
-        charIndex++;
-      } else {
-        clearInterval(typeInterval);
-        setTimeout(() => {
-          setCurrentTextIndex((prev) => (prev + 1) % typingTexts.length);
-        }, 2000);
-      }
+    
+    // Reset to empty before typing new text
+    setTypedText('');
+    
+    // Small delay before starting to type
+    const startDelay = setTimeout(() => {
+      const typeInterval = setInterval(() => {
+        if (charIndex <= text.length) {
+          setTypedText(text.slice(0, charIndex));
+          charIndex++;
+        } else {
+          clearInterval(typeInterval);
+          // Wait before moving to next text
+          setTimeout(() => {
+            setCurrentTextIndex((prev) => (prev + 1) % typingTexts.length);
+          }, 2000);
+        }
+      }, 100);
+      
+      // Store interval ID for cleanup
+      return () => clearInterval(typeInterval);
     }, 100);
 
-    return () => clearInterval(typeInterval);
-  }, [currentTextIndex, typingTexts]);
+    return () => {
+      clearTimeout(startDelay);
+    };
+  }, [currentTextIndex]);
 
   // Load gallery data
   useEffect(() => {
@@ -324,7 +336,7 @@ export default function Home() {
               Hi! I'm David.
             </h1>
             <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-2">
-              A passionate <span className="text-cyan-400">{typedText}</span>
+              A passionate <span className="text-cyan-400 inline-block min-w-[280px] sm:min-w-[350px]">{typedText}</span>
               <span className="animate-pulse">|</span>
             </p>
             <p className="text-gray-400 mb-8">
@@ -483,7 +495,9 @@ export default function Home() {
                       src={galleryData[category.id][0].src}
                       alt={getGalleryAltText(category.id, 0)}
                       className={`w-full h-full object-cover ${
-                        (category.id === 'maternity' || category.id === 'portraits') ? 'object-[center_25%]' : 'object-center'
+                        (category.id === 'maternity' || category.id === 'portraits') ? 'object-[center_25%]' : 
+                        category.id === 'familysession' ? 'object-[center_75%]' : 
+                        'object-center'
                       }`}
                     />
                   ) : (

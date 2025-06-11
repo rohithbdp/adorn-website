@@ -100,7 +100,7 @@ export default function GalleryModal({
               <img
                 src={galleryData[selectedGallery][currentImageIndex].src}
                 alt={getGalleryAltText(selectedGallery, currentImageIndex)}
-                className="w-full h-auto max-h-[60vh] object-contain cursor-zoom-in"
+                className="w-full h-auto max-h-[60vh] cursor-zoom-in object-contain"
                 onClick={() => setImageZoom(true)}
               />
               
@@ -143,7 +143,11 @@ export default function GalleryModal({
                   <img
                     src={photo.src}
                     alt={getGalleryAltText(selectedGallery, index)}
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                    className={`w-full h-full object-cover hover:scale-110 transition-transform duration-300 ${
+                      selectedGallery === 'familysession' && index === 3
+                        ? 'object-[center_25%]'
+                        : ''
+                    }`}
                     loading="lazy"
                   />
                 </button>
