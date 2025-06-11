@@ -7,8 +7,17 @@ export default function Home() {
   const [typedText, setTypedText] = useState('');
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [showFullGallery, setShowFullGallery] = useState(false);
-  const [selectedGallery, setSelectedGallery] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedGallery, setSelectedGallery] = useState<string | null>(null);
+  const [galleryData, setGalleryData] = useState<any>({});
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    eventType: '',
+    message: '',
+    preferredContact: 'email'
+  });
 
   const typingTexts = [
     'Professional Photographer',
@@ -16,44 +25,6 @@ export default function Home() {
     'Memory Creator',
     'Visual Storyteller'
   ];
-
-  // Gallery photos data
-  const galleryPhotos = {
-    weddings: [
-      { src: '/gallery/weddings/wedding-1.jpg', alt: 'Wedding photo 1' },
-      { src: '/gallery/weddings/wedding-2.jpg', alt: 'Wedding photo 2' },
-      { src: '/gallery/weddings/wedding-3.jpg', alt: 'Wedding photo 3' },
-      { src: '/gallery/weddings/wedding-4.jpg', alt: 'Wedding photo 4' },
-      { src: '/gallery/weddings/wedding-5.jpg', alt: 'Wedding photo 5' },
-      { src: '/gallery/weddings/wedding-6.jpg', alt: 'Wedding photo 6' },
-    ],
-    christening: [
-      { src: '/gallery/christening/christening-1.jpg', alt: 'Christening photo 1' },
-      { src: '/gallery/christening/christening-2.jpg', alt: 'Christening photo 2' },
-      { src: '/gallery/christening/christening-3.jpg', alt: 'Christening photo 3' },
-      { src: '/gallery/christening/christening-4.jpg', alt: 'Christening photo 4' },
-    ],
-    homeshoots: [
-      { src: '/miriyala-family.jpg', alt: 'Miriyala Family' },
-      { src: '/gallery/homeshoots/home-1.jpg', alt: 'Home shoot photo 1' },
-      { src: '/gallery/homeshoots/home-2.jpg', alt: 'Home shoot photo 2' },
-      { src: '/gallery/homeshoots/home-3.jpg', alt: 'Home shoot photo 3' },
-      { src: '/gallery/homeshoots/home-4.jpg', alt: 'Home shoot photo 4' },
-    ],
-    babyshower: [
-      { src: '/gallery/babyshower/babyshower-1.jpg', alt: 'Baby shower photo 1' },
-      { src: '/gallery/babyshower/babyshower-2.jpg', alt: 'Baby shower photo 2' },
-      { src: '/gallery/babyshower/babyshower-3.jpg', alt: 'Baby shower photo 3' },
-      { src: '/gallery/babyshower/babyshower-4.jpg', alt: 'Baby shower photo 4' },
-      { src: '/gallery/babyshower/babyshower-5.jpg', alt: 'Baby shower photo 5' },
-    ],
-    housewarming: [
-      { src: '/gallery/housewarming/housewarming-1.jpg', alt: 'House warming photo 1' },
-      { src: '/gallery/housewarming/housewarming-2.jpg', alt: 'House warming photo 2' },
-      { src: '/gallery/housewarming/housewarming-3.jpg', alt: 'House warming photo 3' },
-      { src: '/gallery/housewarming/housewarming-4.jpg', alt: 'House warming photo 4' },
-    ],
-  };
 
   useEffect(() => {
     const text = typingTexts[currentTextIndex];
@@ -72,7 +43,31 @@ export default function Home() {
     }, 100);
 
     return () => clearInterval(typeInterval);
-  }, [currentTextIndex]);
+  }, [currentTextIndex, typingTexts]);
+
+  // Load gallery data
+  useEffect(() => {
+    fetch('/gallery/manifest.json')
+      .then(res => res.json())
+      .then(data => setGalleryData(data))
+      .catch(err => console.error('Error loading gallery:', err));
+  }, []);
+
+  // Handle form submission
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real application, you would send this to a backend
+    const subject = `New inquiry from ${formData.name}`;
+    const body = `Name: ${formData.name}%0D%0AEmail: ${formData.email}%0D%0APhone: ${formData.phone}%0D%0AEvent Type: ${formData.eventType}%0D%0APreferred Contact: ${formData.preferredContact}%0D%0A%0D%0AMessage:%0D%0A${formData.message}`;
+    window.location.href = `mailto:adornphoto.eventrentals@gmail.com?subject=${subject}&body=${body}`;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   return (
     <div className="min-h-screen relative bg-black text-gray-100">
@@ -107,12 +102,19 @@ export default function Home() {
       </div>
 
       {/* Gallery View Modal */}
-      {selectedGallery && (
+      {selectedGallery && galleryData[selectedGallery] && (
         <div className="fixed inset-0 z-[60] bg-black/90 overflow-y-auto">
           <div className="max-w-7xl mx-auto px-6 py-20">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold capitalize">
-                {selectedGallery === 'homeshoots' ? 'Home Shoots' : selectedGallery} Gallery
+              <h2 className="text-3xl font-bold">
+                {selectedGallery === 'firstbirthday' ? '1st Birthday' :
+                 selectedGallery === 'musicconcert' ? 'Music Concert' :
+                 selectedGallery === 'familysession' ? 'Family Session' :
+                 selectedGallery === 'housewarming' ? 'House Warming' :
+                 selectedGallery === 'maternity' ? 'Maternity' :
+                 selectedGallery === 'newborn' ? 'Newborn' :
+                 selectedGallery === 'portraits' ? 'Portraits' :
+                 selectedGallery === 'wedding' ? 'Wedding' : ''} Gallery
               </h2>
               <button
                 onClick={() => setSelectedGallery(null)}
@@ -125,25 +127,13 @@ export default function Home() {
             </div>
             
             <div className="grid md:grid-cols-3 gap-6">
-              {galleryPhotos[selectedGallery as keyof typeof galleryPhotos]?.map((photo, index) => (
+              {galleryData[selectedGallery]?.map((photo: any, index: number) => (
                 <div key={index} className="relative aspect-square overflow-hidden rounded-lg">
                   <img
                     src={photo.src}
                     alt={photo.alt}
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                     loading="lazy"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      // Fallback images based on category
-                      const fallbacks: Record<string, string> = {
-                        weddings: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800',
-                        christening: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
-                        homeshoots: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
-                        babyshower: 'https://images.unsplash.com/photo-1549831243-a69715b24f78?w=800',
-                        housewarming: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
-                      };
-                      target.src = fallbacks[selectedGallery] || 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800';
-                    }}
                   />
                 </div>
               ))}
@@ -152,21 +142,24 @@ export default function Home() {
         </div>
       )}
 
-      {/* Logo above navigation */}
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 pt-3">
-        <img 
-          src="/adorn-logo.png" 
-          alt="aDorn Logo" 
-          className="h-10 w-auto"
-        />
-      </div>
-
       {/* Navigation */}
-      <nav className="fixed top-16 w-full z-50 px-4 sm:px-6 py-4">
+      <nav className="fixed top-0 w-full z-50 px-4 sm:px-6 py-4 bg-black/50 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
+          {/* Left side - Company name */}
           <div className="text-cyan-400 text-base sm:text-xl logo-text">
             aDorn<span className="hidden sm:inline"> Photography & Event Rentals LLC</span>
           </div>
+          
+          {/* Center - Logo */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <img 
+              src="/adorn-logo-white.png" 
+              alt="aDorn Logo" 
+              className="h-12 w-auto"
+            />
+          </div>
+          
+          {/* Right side - Navigation */}
           <div className="hidden md:flex space-x-8">
             <a href="#hero" className="hover:text-cyan-400 transition-colors">Home</a>
             <a href="#about" className="hover:text-cyan-400 transition-colors">About</a>
@@ -207,7 +200,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex items-center px-6 relative pt-20">
+      <section id="hero" className="min-h-screen flex items-center px-6 relative pt-24">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center w-full">
           <div className="animate-fadeInLeft">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
@@ -231,14 +224,14 @@ export default function Home() {
             </div>
 
             <div className="flex space-x-4">
-              <a href="https://www.instagram.com/adorn_david" className="text-gray-400 hover:text-cyan-400 transition-colors">
+              <a href="https://www.instagram.com/adorn_david" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 transition-colors">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
                   <path d="M12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z" />
                   <circle cx="18.406" cy="5.594" r="1.44" />
                 </svg>
               </a>
-              <a href="https://www.facebook.com/adornfotography" className="text-gray-400 hover:text-cyan-400 transition-colors">
+              <a href="https://www.facebook.com/adornfotography" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 transition-colors">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
@@ -327,195 +320,68 @@ export default function Home() {
           <h2 className="text-4xl font-bold text-center mb-2">Gallery</h2>
           <div className="w-20 h-1 bg-cyan-400 mx-auto mb-12"></div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Project 1 */}
-            <div 
-              onClick={() => setSelectedGallery('weddings')}
-              className="bg-gradient-to-br from-purple-900/20 to-purple-600/20 border border-purple-500/20 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer">
-              <img
-                src="/gallery/weddings/wedding-1.jpg"
-                alt="Wedding Photography"
-                className="w-full h-48 object-cover"
-                loading="lazy"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">Wedding</h3>
-                <p className="text-gray-400 mb-4 text-sm">
-                  A stunning sunset ceremony capturing the love and joy of Fiona & Bonnell's special day.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Wedding</span>
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Beach</span>
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Sunset</span>
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/* Gallery Categories */}
+            {[
+              { id: 'firstbirthday', name: '1st Birthday', icon: '🎂', color: 'pink', desc: 'Magical first birthday celebrations captured forever.' },
+              { id: 'musicconcert', name: 'Music Concert', icon: '🎵', color: 'purple', desc: 'Live performances and musical moments in stunning detail.' },
+              { id: 'familysession', name: 'Family Session', icon: '👨‍👩‍👧‍👦', color: 'blue', desc: 'Authentic family moments captured in natural settings.' },
+              { id: 'housewarming', name: 'House Warming', icon: '🏠', color: 'orange', desc: 'Celebrating new beginnings in your dream home.' },
+              { id: 'maternity', name: 'Maternity', icon: '🤰', color: 'rose', desc: 'Beautiful maternity portraits celebrating motherhood.' },
+              { id: 'newborn', name: 'Newborn', icon: '👶', color: 'yellow', desc: 'Precious first moments of your little one\'s journey.' },
+              { id: 'portraits', name: 'Portraits', icon: '🎨', color: 'teal', desc: 'Professional portraits that capture your unique essence.' },
+              { id: 'wedding', name: 'Wedding', icon: '💒', color: 'red', desc: 'Your love story captured in timeless wedding photography.' }
+            ].map((category) => (
+              <div
+                key={category.id}
+                onClick={() => setSelectedGallery(category.id)}
+                className={`rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer ${
+                  category.color === 'pink' ? 'bg-gradient-to-br from-pink-900/20 to-pink-600/20 border border-pink-500/20' :
+                  category.color === 'purple' ? 'bg-gradient-to-br from-purple-900/20 to-purple-600/20 border border-purple-500/20' :
+                  category.color === 'blue' ? 'bg-gradient-to-br from-blue-900/20 to-blue-600/20 border border-blue-500/20' :
+                  category.color === 'orange' ? 'bg-gradient-to-br from-orange-900/20 to-orange-600/20 border border-orange-500/20' :
+                  category.color === 'rose' ? 'bg-gradient-to-br from-rose-900/20 to-rose-600/20 border border-rose-500/20' :
+                  category.color === 'yellow' ? 'bg-gradient-to-br from-yellow-900/20 to-yellow-600/20 border border-yellow-500/20' :
+                  category.color === 'teal' ? 'bg-gradient-to-br from-teal-900/20 to-teal-600/20 border border-teal-500/20' :
+                  category.color === 'red' ? 'bg-gradient-to-br from-red-900/20 to-red-600/20 border border-red-500/20' :
+                  'bg-gradient-to-br from-gray-900/20 to-gray-600/20 border border-gray-500/20'
+                }`}
+              >
+                <div className="aspect-video bg-gray-800 overflow-hidden">
+                  {galleryData[category.id] && galleryData[category.id][0] ? (
+                    <img
+                      src={galleryData[category.id][0].src}
+                      alt={category.name}
+                      className={`w-full h-full object-cover ${
+                        (category.id === 'maternity' || category.id === 'portraits') ? 'object-[center_25%]' : 'object-center'
+                      }`}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <span className="text-4xl">{category.icon}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedGallery('weddings');
-                    }}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm">VIEW GALLERY</button>
-                  <button 
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm">DETAILS</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Project 2 */}
-            <div 
-              onClick={() => setSelectedGallery('christening')}
-              className="bg-gradient-to-br from-cyan-900/20 to-cyan-600/20 border border-cyan-500/20 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer">
-              <img
-                src="/gallery/christening/christening-1.jpg"
-                alt="Christening Photography"
-                className="w-full h-48 object-cover"
-                loading="lazy"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">Christening</h3>
-                <p className="text-gray-400 mb-4 text-sm">
-                  Sacred moments beautifully preserved during this traditional ceremony.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Christening</span>
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Church</span>
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Family</span>
-                </div>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedGallery('christening');
-                    }}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm">VIEW GALLERY</button>
-                  <button 
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm">DETAILS</button>
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
+                  <p className="text-gray-400 mb-4 text-sm">{category.desc}</p>
+                  <button className="text-cyan-400 hover:text-cyan-300 text-sm">
+                    {galleryData[category.id] 
+                      ? `VIEW ${galleryData[category.id].length} PHOTO${galleryData[category.id].length !== 1 ? 'S' : ''}`
+                      : 'LOADING...'}
+                  </button>
                 </div>
               </div>
-            </div>
-
-            {/* Project 3 */}
-            <div 
-              onClick={() => setSelectedGallery('homeshoots')}
-              className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer">
-              <img
-                src="/miriyala-family.jpg"
-                alt="Miriyala Family Portrait"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">Miriyala Family Session</h3>
-                <p className="text-gray-400 mb-4 text-sm">
-                  Authentic family moments captured in the comfort of their beautiful home.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Family</span>
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Home</span>
-                  <span className="text-xs px-2 py-1 bg-gray-800 rounded">Lifestyle</span>
-                </div>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedGallery('homeshoots');
-                    }}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm">VIEW GALLERY</button>
-                  <button 
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm">DETAILS</button>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-
-          {/* Additional Gallery Items - Show when expanded */}
-          {showFullGallery && (
-            <div className="grid md:grid-cols-3 gap-6 mt-6 animate-fadeIn">
-              {/* Baby Shower */}
-              <div 
-                onClick={() => setSelectedGallery('babyshower')}
-                className="bg-gradient-to-br from-pink-900/20 to-pink-600/20 border border-pink-500/20 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer">
-                <img
-                  src="/gallery/babyshower/babyshower-1.jpg"
-                  alt="Baby Shower Photography"
-                  className="w-full h-48 object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://images.unsplash.com/photo-1549831243-a69715b24f78?w=800';
-                  }}
-                />
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">Baby Shower</h3>
-                  <p className="text-gray-400 mb-4 text-sm">
-                    Celebrating new beginnings with joy, laughter, and precious moments.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded">Baby Shower</span>
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded">Celebration</span>
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded">Family</span>
-                  </div>
-                  <div className="flex gap-4">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedGallery('babyshower');
-                      }}
-                      className="text-cyan-400 hover:text-cyan-300 text-sm">VIEW GALLERY</button>
-                    <button 
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-cyan-400 hover:text-cyan-300 text-sm">DETAILS</button>
-                  </div>
-                </div>
-              </div>
-
-              {/* House Warming */}
-              <div 
-                onClick={() => setSelectedGallery('housewarming')}
-                className="bg-gradient-to-br from-orange-900/20 to-orange-600/20 border border-orange-500/20 rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer">
-                <img
-                  src="/gallery/housewarming/housewarming-1.jpg"
-                  alt="House Warming Photography"
-                  className="w-full h-48 object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800';
-                  }}
-                />
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">House Warming</h3>
-                  <p className="text-gray-400 mb-4 text-sm">
-                    Capturing the warmth and happiness of your new home celebrations.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded">House Warming</span>
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded">New Home</span>
-                    <span className="text-xs px-2 py-1 bg-gray-800 rounded">Celebration</span>
-                  </div>
-                  <div className="flex gap-4">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedGallery('housewarming');
-                      }}
-                      className="text-cyan-400 hover:text-cyan-300 text-sm">VIEW GALLERY</button>
-                    <button 
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-cyan-400 hover:text-cyan-300 text-sm">DETAILS</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="text-center mt-12">
-            <button 
-              onClick={() => setShowFullGallery(!showFullGallery)}
-              className="inline-block px-6 py-3 border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all">
-              {showFullGallery ? 'SHOW LESS' : 'SEE ALL GALLERIES'}
-            </button>
+            <p className="text-gray-400 mb-4">Click on any gallery to view photos</p>
+            <a href="#contact" className="inline-block px-6 py-3 bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition-colors">
+              BOOK YOUR SESSION
+            </a>
           </div>
+
         </div>
       </section>
 
@@ -694,11 +560,151 @@ export default function Home() {
             <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 text-center hover:border-cyan-400 transition-colors">
               <div className="text-4xl mb-4">📍</div>
               <h3 className="font-semibold mb-2">Location</h3>
-              <p className="text-sm text-gray-400 mb-4">Gilbert, Arizona</p>
-              <a href="#" className="inline-block px-4 py-2 bg-cyan-400 text-black text-sm font-medium hover:bg-cyan-300 transition-colors">
-                GET DIRECTIONS
-              </a>
+              <p className="text-sm text-gray-400">Gilbert, Arizona</p>
+              <div className="mt-4 space-y-1">
+                <p className="text-xs text-gray-500">Business Hours:</p>
+                <p className="text-xs text-gray-400">Mon-Fri: 9AM - 6PM</p>
+                <p className="text-xs text-gray-400">Sat-Sun: 10AM - 7PM</p>
+              </div>
             </div>
+          </div>
+
+          <p className="text-center text-gray-400 mt-8 mb-12">
+            <span className="text-cyan-400">✉️</span> We typically respond within 24 hours
+          </p>
+
+          {/* Contact Form */}
+          <div className="max-w-2xl mx-auto mt-12">
+            <h3 className="text-2xl font-semibold text-center mb-8">Send Us a Message</h3>
+            <form onSubmit={handleFormSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                    Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+                    Phone (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="eventType" className="block text-sm font-medium text-gray-300 mb-2">
+                    Event Type *
+                  </label>
+                  <input
+                    type="text"
+                    id="eventType"
+                    name="eventType"
+                    required
+                    value={formData.eventType}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors"
+                    placeholder="e.g., Wedding, Birthday, Corporate Event"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="preferredContact" className="block text-sm font-medium text-gray-300 mb-2">
+                  Preferred Contact Method
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="preferredContact"
+                      value="email"
+                      checked={formData.preferredContact === 'email'}
+                      onChange={handleInputChange}
+                      className="mr-2 text-cyan-400"
+                    />
+                    <span className="text-sm">Email</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="preferredContact"
+                      value="phone"
+                      checked={formData.preferredContact === 'phone'}
+                      onChange={handleInputChange}
+                      className="mr-2 text-cyan-400"
+                    />
+                    <span className="text-sm">Phone</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="preferredContact"
+                      value="whatsapp"
+                      checked={formData.preferredContact === 'whatsapp'}
+                      onChange={handleInputChange}
+                      className="mr-2 text-cyan-400"
+                    />
+                    <span className="text-sm">WhatsApp</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+                  Message *
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  rows={5}
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg focus:border-cyan-400 focus:outline-none transition-colors resize-none"
+                  placeholder="Tell us about your event and what you're looking for..."
+                />
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="submit"
+                  className="px-8 py-3 bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition-colors"
+                >
+                  SEND MESSAGE
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </section>
@@ -707,14 +713,14 @@ export default function Home() {
       <footer className="py-8 px-6 border-t border-gray-800 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-center space-x-4 mb-4">
-            <a href="https://www.instagram.com/adorn_david" className="text-gray-400 hover:text-cyan-400 transition-colors">
+            <a href="https://www.instagram.com/adorn_david" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 transition-colors">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z" />
                 <path d="M12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z" />
                 <circle cx="18.406" cy="5.594" r="1.44" />
               </svg>
             </a>
-            <a href="https://www.facebook.com/adornfotography" className="text-gray-400 hover:text-cyan-400 transition-colors">
+            <a href="https://www.facebook.com/adornfotography" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 transition-colors">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>

@@ -131,3 +131,15 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* Hide Next.js dev indicator */
+nextjs-portal {
+  display: none !important;
+}
+
+/* Alternative selectors for Next.js overlay */
+[data-nextjs-indicator],
+[data-nextjs-build-indicator],
+[data-nextjs-prerender-indicator] {
+  display: none !important;
+}
