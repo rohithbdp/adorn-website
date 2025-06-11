@@ -93,8 +93,14 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Remove focus outline */
-*:focus {
+/* Focus styles for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #64ffda;
+  outline-offset: 2px;
+}
+
+/* Remove default focus outline for mouse users */
+*:focus:not(:focus-visible) {
   outline: none;
 }
 
@@ -112,6 +118,36 @@ html {
 
 .animate-twinkle {
   animation: twinkle ease-in-out infinite;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .animate-twinkle {
+    animation: none;
+    opacity: 0.8;
+  }
+  
+  .animate-fadeInLeft,
+  .animate-fadeInRight,
+  .animate-fadeIn {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .hover\:scale-105:hover,
+  .hover\:scale-110:hover {
+    transform: none;
+  }
 }
 
 /* Custom scrollbar */
