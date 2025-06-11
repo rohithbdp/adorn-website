@@ -99,22 +99,28 @@ export default function Home() {
       });
   }, []);
 
-  // Handle form submission
+  // Handle form submission with Formspree
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setSubmitStatus('idle');
     
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch('https://formspree.io/f/movwdjwl', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          eventType: formData.eventType,
+          message: formData.message,
+          preferredContact: formData.preferredContact,
+          _subject: `New inquiry from ${formData.name} - ${formData.eventType}`
+        }),
       });
-      
-      const result = await response.json();
       
       if (response.ok) {
         setSubmitStatus('success');
@@ -129,7 +135,7 @@ export default function Home() {
         });
       } else {
         setSubmitStatus('error');
-        console.error('Form submission error:', result.error);
+        console.error('Form submission error');
       }
     } catch (error) {
       setSubmitStatus('error');
