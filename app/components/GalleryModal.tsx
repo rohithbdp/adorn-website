@@ -48,9 +48,9 @@ export default function GalleryModal({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="flex justify-between items-center mb-8">
-          <h2 id="gallery-title" className="text-3xl font-bold">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div className="flex justify-between items-center mb-4 sm:mb-8">
+          <h2 id="gallery-title" className="text-xl sm:text-2xl md:text-3xl font-bold">
             {selectedGallery === 'firstbirthday' ? '1st Birthday' :
              selectedGallery === 'musicconcert' ? 'Music Concert' :
              selectedGallery === 'familysession' ? 'Family Session' :
@@ -130,7 +130,7 @@ export default function GalleryModal({
             </div>
             
             {/* Thumbnail Grid */}
-            <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1 sm:gap-2">
               {galleryData[selectedGallery]?.map((photo: any, index: number) => (
                 <button
                   key={index}
@@ -156,11 +156,14 @@ export default function GalleryModal({
             
             {/* Image Counter and Instructions */}
             <div className="mt-4 text-center text-gray-400">
-              <p className="mb-2">
+              <p className="text-sm sm:text-base mb-2">
                 Image {currentImageIndex + 1} of {galleryData[selectedGallery].length}
               </p>
-              <p className="text-sm">
+              <p className="text-xs sm:text-sm hidden sm:block">
                 Use arrow keys to navigate • Press Space or Enter to zoom • Press Escape to close
+              </p>
+              <p className="text-xs sm:hidden">
+                Swipe to navigate • Tap to zoom
               </p>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import Image from 'next/image';
 import { getGalleryAltText, getCategoryDescription } from './utils/galleryHelpers';
 import { GallerySkeleton, ImageSkeleton } from './components/SkeletonLoader';
+import MobileMenu from './components/MobileMenu';
 
 // Dynamic import for gallery modal
 const GalleryModal = lazy(() => import('./components/GalleryModal'));
@@ -243,6 +244,9 @@ export default function Home() {
         })}
       </div>
 
+      {/* Mobile Menu */}
+      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} basePath={basePath} />
+      
       {/* Gallery View Modal */}
       {selectedGallery && galleryData[selectedGallery] && (
         <Suspense fallback={
@@ -329,25 +333,24 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex items-center px-6 relative pt-24">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center w-full">
+      <section id="hero" className="min-h-screen flex items-center px-4 sm:px-6 relative pt-20 sm:pt-24">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12 items-center w-full">
           <div className="animate-fadeInLeft">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
               Hi! I'm David.
             </h1>
-            <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-2">
-              A passionate <span className="text-cyan-400 inline-block min-w-[280px] sm:min-w-[350px]">{typedText}</span>
-              <span className="animate-pulse">|</span>
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-2">
+              A passionate <span className="text-cyan-400 block sm:inline-block sm:min-w-[280px] md:min-w-[350px]">{typedText}</span>
             </p>
-            <p className="text-gray-400 mb-8">
+            <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8">
               Capturing life's precious moments through creative lens work and professional event services.
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-8">
-              <a href="#projects" className="px-6 py-3 bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition-colors">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
+              <a href="#projects" className="px-4 sm:px-6 py-2.5 sm:py-3 bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition-colors text-center text-sm sm:text-base">
                 VIEW MY WORK
               </a>
-              <a href="#contact" className="px-6 py-3 border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all">
+              <a href="#contact" className="px-4 sm:px-6 py-2.5 sm:py-3 border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all text-center text-sm sm:text-base">
                 BOOK SESSION
               </a>
             </div>
@@ -378,16 +381,16 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="animate-fadeInRight flex justify-center mt-8 md:mt-0">
+          <div className="animate-fadeInRight flex justify-center mt-6 sm:mt-8 md:mt-0">
             <div className="relative">
-              <div className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 hexagon bg-cyan-400 p-1">
-                <div className="w-full h-full hexagon bg-black p-2">
+              <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 hexagon bg-cyan-400 p-1">
+                <div className="w-full h-full hexagon bg-black p-1 sm:p-2">
                   <div className="relative w-full h-full hexagon overflow-hidden">
                     <Image
                       src={`${basePath}/photographer-profile.jpg`}
                       alt="David - Professional Photographer specializing in weddings, maternity, and family portraits"
                       fill
-                      sizes="(max-width: 640px) 192px, (max-width: 768px) 256px, 320px"
+                      sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, (max-width: 1024px) 256px, 320px"
                       className="object-cover"
                       priority
                     />
@@ -400,13 +403,13 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 px-6 relative">
+      <section id="about" className="py-16 sm:py-20 px-4 sm:px-6 relative">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-2">About Me</h2>
-          <div className="w-20 h-1 bg-cyan-400 mx-auto mb-12"></div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-2">About Me</h2>
+          <div className="w-16 sm:w-20 h-1 bg-cyan-400 mx-auto mb-8 sm:mb-12"></div>
 
-          <div className="grid md:grid-cols-3 gap-8 items-center">
-            <div className="md:col-span-1">
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-center">
+            <div className="md:col-span-1 order-2 md:order-1">
               <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=400"
@@ -418,33 +421,33 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="md:col-span-2 space-y-4">
-              <p className="text-gray-300">
+            <div className="md:col-span-2 space-y-3 sm:space-y-4 order-1 md:order-2">
+              <p className="text-sm sm:text-base text-gray-300">
                 I am a professional photographer dedicated to capturing the essence of life's most precious
                 moments. From intimate family gatherings to grand wedding celebrations, I bring a unique
                 blend of technical expertise and artistic vision.
               </p>
-              <p className="text-gray-300">
+              <p className="text-sm sm:text-base text-gray-300">
                 As the founder of aDorn Photography & Event Rentals LLC, I not only provide photography
                 services but also comprehensive event solutions including photo booths, lighting, and décor
                 to ensure your special occasions are perfectly documented and beautifully presented.
               </p>
 
-              <div className="grid grid-cols-3 gap-4 mt-8">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6 sm:mt-8">
                 <div className="text-center">
-                  <div className="text-cyan-400 text-3xl mb-2">📸</div>
-                  <h3 className="font-semibold">Photography</h3>
-                  <p className="text-sm text-gray-400">Professional Services</p>
+                  <div className="text-cyan-400 text-2xl sm:text-3xl mb-1 sm:mb-2">📸</div>
+                  <h3 className="text-sm sm:text-base font-semibold">Photography</h3>
+                  <p className="text-xs sm:text-sm text-gray-400">Professional Services</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-cyan-400 text-3xl mb-2">🎪</div>
-                  <h3 className="font-semibold">Events</h3>
-                  <p className="text-sm text-gray-400">Complete Solutions</p>
+                  <div className="text-cyan-400 text-2xl sm:text-3xl mb-1 sm:mb-2">🎪</div>
+                  <h3 className="text-sm sm:text-base font-semibold">Events</h3>
+                  <p className="text-xs sm:text-sm text-gray-400">Complete Solutions</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-cyan-400 text-3xl mb-2">🎨</div>
-                  <h3 className="font-semibold">Creative</h3>
-                  <p className="text-sm text-gray-400">Artistic Vision</p>
+                  <div className="text-cyan-400 text-2xl sm:text-3xl mb-1 sm:mb-2">🎨</div>
+                  <h3 className="text-sm sm:text-base font-semibold">Creative</h3>
+                  <p className="text-xs sm:text-sm text-gray-400">Artistic Vision</p>
                 </div>
               </div>
             </div>
@@ -453,12 +456,12 @@ export default function Home() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-20 px-6 relative">
+      <section id="projects" className="py-16 sm:py-20 px-4 sm:px-6 relative">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-2">Gallery</h2>
-          <div className="w-20 h-1 bg-cyan-400 mx-auto mb-12"></div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-2">Gallery</h2>
+          <div className="w-16 sm:w-20 h-1 bg-cyan-400 mx-auto mb-8 sm:mb-12"></div>
 
-          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {/* Gallery Categories */}
             {[
               { id: 'firstbirthday', name: '1st Birthday', icon: '🎂', color: 'pink', desc: 'Magical first birthday celebrations captured forever.' },
@@ -506,10 +509,10 @@ export default function Home() {
                     </div>
                   )}
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
-                  <p className="text-gray-400 mb-4 text-sm">{category.desc}</p>
-                  <span className="text-cyan-400 hover:text-cyan-300 text-sm" role="text">
+                <div className="p-3 sm:p-4 md:p-6">
+                  <h3 className="text-sm sm:text-base md:text-xl font-semibold mb-1 sm:mb-2">{category.name}</h3>
+                  <p className="text-gray-400 mb-2 sm:mb-4 text-xs sm:text-sm hidden sm:block">{category.desc}</p>
+                  <span className="text-cyan-400 hover:text-cyan-300 text-xs sm:text-sm" role="text">
                     {loadingGallery ? (
                       <span className="inline-block h-4 w-20 bg-gray-800 rounded animate-pulse"></span>
                     ) : galleryData[category.id] ? (
@@ -523,9 +526,9 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <p className="text-gray-400 mb-4">Click on any gallery to view photos</p>
-            <a href="#contact" className="inline-block px-6 py-3 bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition-colors">
+          <div className="text-center mt-8 sm:mt-12">
+            <p className="text-sm sm:text-base text-gray-400 mb-4">Click on any gallery to view photos</p>
+            <a href="#contact" className="inline-block px-4 sm:px-6 py-2.5 sm:py-3 bg-cyan-400 text-black font-medium hover:bg-cyan-300 transition-colors text-sm sm:text-base">
               BOOK YOUR SESSION
             </a>
           </div>
@@ -534,10 +537,10 @@ export default function Home() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-20 px-6 relative">
+      <section id="skills" className="py-16 sm:py-20 px-4 sm:px-6 relative">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-2">Services & Skills</h2>
-          <div className="w-20 h-1 bg-cyan-400 mx-auto mb-12"></div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-2">Services & Skills</h2>
+          <div className="w-16 sm:w-20 h-1 bg-cyan-400 mx-auto mb-8 sm:mb-12"></div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div>
@@ -681,17 +684,17 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 px-6 relative">
+      <section id="contact" className="py-16 sm:py-20 px-4 sm:px-6 relative">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-2">Get In Touch</h2>
-          <div className="w-20 h-1 bg-cyan-400 mx-auto mb-12"></div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-2">Get In Touch</h2>
+          <div className="w-16 sm:w-20 h-1 bg-cyan-400 mx-auto mb-8 sm:mb-12"></div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 text-center hover:border-cyan-400 transition-colors">
-              <div className="text-4xl mb-4">📧</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 sm:p-6 text-center hover:border-cyan-400 transition-colors">
+              <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">📧</div>
               <h3 className="font-semibold mb-2">Email</h3>
-              <p className="text-xs sm:text-sm text-gray-400 mb-4 break-all">adornphoto.eventrentals@gmail.com</p>
-              <a href="mailto:adornphoto.eventrentals@gmail.com" className="inline-block px-4 py-2 bg-cyan-400 text-black text-sm font-medium hover:bg-cyan-300 transition-colors">
+              <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4 break-all">adornphoto.eventrentals@gmail.com</p>
+              <a href="mailto:adornphoto.eventrentals@gmail.com" className="inline-block px-3 sm:px-4 py-2 bg-cyan-400 text-black text-xs sm:text-sm font-medium hover:bg-cyan-300 transition-colors">
                 SEND EMAIL
               </a>
             </div>
@@ -791,7 +794,7 @@ export default function Home() {
                 <label htmlFor="preferredContact" className="block text-sm font-medium text-gray-300 mb-2">
                   Preferred Contact Method
                 </label>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <label className="flex items-center">
                     <input
                       type="radio"
