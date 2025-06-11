@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
+const basePath = process.env.NODE_ENV === 'production' ? '/adorn-website' : '';
+
 export default function Home() {
   const [typedText, setTypedText] = useState('');
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
@@ -47,9 +49,24 @@ export default function Home() {
 
   // Load gallery data
   useEffect(() => {
-    fetch('/adorn-website/gallery/manifest.json')
+    fetch(`${basePath}/gallery/manifest.json`)
       .then(res => res.json())
-      .then(data => setGalleryData(data))
+      .then(data => {
+        // Add base path to all image URLs in production
+        if (basePath) {
+          const updatedData: any = {};
+          Object.keys(data).forEach(category => {
+            updatedData[category] = data[category].map((item: any) => ({
+              ...item,
+              src: `${basePath}${item.src}`,
+              webp: item.webp ? `${basePath}${item.webp}` : undefined
+            }));
+          });
+          setGalleryData(updatedData);
+        } else {
+          setGalleryData(data);
+        }
+      })
       .catch(err => console.error('Error loading gallery:', err));
   }, []);
 
@@ -153,7 +170,7 @@ export default function Home() {
           {/* Center - Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <img 
-              src="/adorn-website/adorn-logo-white.png" 
+              src={`${basePath}/adorn-logo-white.png`} 
               alt="aDorn Logo" 
               className="h-12 w-auto"
             />
@@ -254,7 +271,7 @@ export default function Home() {
               <div className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 hexagon bg-cyan-400 p-1">
                 <div className="w-full h-full hexagon bg-black p-2">
                   <img
-                    src="/adorn-website/photographer-profile.jpg"
+                    src={`${basePath}/photographer-profile.jpg`}
                     alt="David - Professional Photographer"
                     className="w-full h-full object-cover hexagon"
                   />
