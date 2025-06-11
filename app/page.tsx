@@ -47,7 +47,7 @@ export default function Home() {
 
   // Load gallery data
   useEffect(() => {
-    fetch('/gallery/manifest.json')
+    fetch('/adorn-website/gallery/manifest.json')
       .then(res => res.json())
       .then(data => setGalleryData(data))
       .catch(err => console.error('Error loading gallery:', err));
@@ -153,7 +153,7 @@ export default function Home() {
           {/* Center - Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <img 
-              src="/adorn-logo-white.png" 
+              src="/adorn-website/adorn-logo-white.png" 
               alt="aDorn Logo" 
               className="h-12 w-auto"
             />
@@ -254,7 +254,7 @@ export default function Home() {
               <div className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 hexagon bg-cyan-400 p-1">
                 <div className="w-full h-full hexagon bg-black p-2">
                   <img
-                    src="/photographer-profile.jpg"
+                    src="/adorn-website/photographer-profile.jpg"
                     alt="David - Professional Photographer"
                     className="w-full h-full object-cover hexagon"
                   />
