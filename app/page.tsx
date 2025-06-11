@@ -488,15 +488,16 @@ export default function Home() {
             ].map((category) => (
               <button
                 key={category.id}
-                onClick={() => {
+                onPointerUp={(e) => {
+                  e.preventDefault();
                   // Force complete reset
                   setCurrentImageIndex(0);
                   setImageZoom(false);
                   setGalleryKey(prev => prev + 1); // Force re-render
-                  // Small delay to ensure state is cleared
-                  setTimeout(() => {
+                  // Use requestAnimationFrame for better timing
+                  requestAnimationFrame(() => {
                     setSelectedGallery(category.id);
-                  }, 50);
+                  });
                 }}
                 className={`rounded-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-black text-left w-full ${
                   category.color === 'pink' ? 'bg-gradient-to-br from-pink-900/20 to-pink-600/20 border border-pink-500/20' :

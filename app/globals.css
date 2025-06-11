@@ -179,3 +179,30 @@ nextjs-portal {
 [data-nextjs-prerender-indicator] {
   display: none !important;
 }
+
+/* Improve touch handling for mobile gallery thumbnails */
+@media (pointer: coarse) {
+  button[data-index] {
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Increase touch target size slightly */
+  button[data-index]::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    z-index: -1;
+  }
+  
+  /* Prevent accidental touches during scrolling */
+  .touch-scrolling button[data-index] {
+    pointer-events: none;
+  }
+}

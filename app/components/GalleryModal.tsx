@@ -30,10 +30,14 @@ export default function GalleryModal({
   handleTouchEnd
 }: GalleryModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const lastTouchTime = useRef<number>(0);
 
   useEffect(() => {
     // Focus modal on mount for keyboard navigation
     modalRef.current?.focus();
+    // Ensure index is reset on mount
+    console.log(`Gallery opened: ${selectedGallery}, starting at index ${currentImageIndex}`);
   }, []);
 
   return (
@@ -91,7 +95,7 @@ export default function GalleryModal({
               </svg>
             </button>
             <img
-              src={galleryData[selectedGallery][currentImageIndex].src}
+              src={galleryData[selectedGallery][currentImageIndex]?.src || ''}
               alt={getGalleryAltText(selectedGallery, currentImageIndex)}
               className="w-full h-auto max-h-[90vh] object-contain"
             />
@@ -101,7 +105,7 @@ export default function GalleryModal({
             {/* Main Image Display */}
             <div className="relative mb-6">
               <img
-                src={galleryData[selectedGallery][currentImageIndex].src}
+                src={galleryData[selectedGallery][currentImageIndex]?.src || ''}
                 alt={getGalleryAltText(selectedGallery, currentImageIndex)}
                 className="w-full h-auto max-h-[60vh] cursor-zoom-in object-contain"
                 onClick={() => setImageZoom(true)}
@@ -134,27 +138,60 @@ export default function GalleryModal({
             
             {/* Thumbnail Grid */}
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1 sm:gap-2">
-              {galleryData[selectedGallery]?.map((photo: any, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`relative aspect-square overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
-                    index === currentImageIndex ? 'ring-2 ring-cyan-400' : ''
-                  }`}
-                  aria-label={`View image ${index + 1} of ${galleryData[selectedGallery].length}`}
-                >
-                  <img
-                    src={photo.src}
-                    alt={getGalleryAltText(selectedGallery, index)}
-                    className={`w-full h-full object-cover hover:scale-110 transition-transform duration-300 ${
-                      selectedGallery === 'familysession' && index === 3
-                        ? 'object-[center_25%]'
-                        : ''
+              {galleryData[selectedGallery]?.map((photo: any, index: number) => {
+                const handleThumbnailClick = (idx: number) => {
+                  // Debounce rapid touches
+                  const now = Date.now();
+                  if (now - lastTouchTime.current < 300) {
+                    return;
+                  }
+                  lastTouchTime.current = now;
+                  
+                  console.log(`Thumbnail clicked: index ${idx}`);
+                  setCurrentImageIndex(idx);
+                };
+                
+                return (
+                  <button
+                    key={`thumb-${selectedGallery}-${index}`}
+                    ref={(el) => { thumbnailRefs.current[index] = el; }}
+                    data-index={index}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleThumbnailClick(index);
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // For touch devices, use the bound index directly
+                      handleThumbnailClick(index);
+                    }}
+                    onPointerDown={(e) => {
+                      // Prevent any default touch behaviors
+                      e.preventDefault();
+                    }}
+                    className={`relative aspect-square overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 touch-none select-none ${
+                      index === currentImageIndex ? 'ring-2 ring-cyan-400' : ''
                     }`}
-                    loading="lazy"
-                  />
-                </button>
-              ))}
+                    aria-label={`View image ${index + 1} of ${galleryData[selectedGallery].length}`}
+                    type="button"
+                    style={{ touchAction: 'none' }}
+                  >
+                    <img
+                      src={photo.src}
+                      alt={getGalleryAltText(selectedGallery, index)}
+                      className={`w-full h-full object-cover hover:scale-110 transition-transform duration-300 pointer-events-none ${
+                        selectedGallery === 'familysession' && index === 3
+                          ? 'object-[center_25%]'
+                          : ''
+                      }`}
+                      loading="eager"
+                      draggable={false}
+                    />
+                  </button>
+                );
+              })}
             </div>
             
             {/* Image Counter and Instructions */}
